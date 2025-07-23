@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ScannerScreen from '../screens/ScannerScreen';
 import { AuthContext } from '../contexts/AuthContext';
 import OtpScreen from '../screens/OtpScreen';
+import PersonalDetails from '../screens/PersonalDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,10 +17,11 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isLoggedIn ? 'Home' : 'Login'}>
+      <Stack.Navigator initialRouteName={isLoggedIn ? 'Home' : 'Login'} screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="OTP" component={OtpScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
         <Stack.Screen name="Scanner" component={ScannerScreen} />
       </Stack.Navigator>
     </NavigationContainer>
