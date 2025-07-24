@@ -60,7 +60,7 @@ export default function PersonDetails({ route, navigation }) {
     try {
         const { scannedImages } = await DocumentScanner.scanDocument();
         if (scannedImages && scannedImages.length) {
-        console.log('Flattened scanned image:', scannedImages[0]);
+        console.log('Flattened scanned images:', scannedImages);
         // You can display or process the flattened image here
         } else {
         console.log('No document scanned.');
