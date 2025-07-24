@@ -14,11 +14,11 @@ const dummyApiResponse = {
   status: 200,
   message: '',
   data: [
-    { id: '1', name: 'John Doe', prn: 'PRN001', bed: 'B1', ward: 'Ward A', floor: '1' },
-    { id: '2', name: 'Jane Smith', prn: 'PRN002', bed: 'B2', ward: 'Ward A', floor: '2' },
-    { id: '3', name: 'Sam Wilson', prn: 'PRN003', bed: 'B3', ward: 'Ward B', floor: '1' },
-    { id: '4', name: 'Emily Brown', prn: 'PRN004', bed: 'B4', ward: 'Ward B', floor: '3' },
-    { id: '5', name: 'Chris Green', prn: 'PRN005', bed: 'B5', ward: 'Ward A', floor: '2' },
+    { id: '1', name: 'John Doe', age: 30, gender: "Male", prn: 'PRN001', bed: 'B1', ward: 'Ward A', floor: '1', insuranceCompany: "ABC Insurance", preauthStatus: "Draft", admissionDate: "2023-01-01" },
+    { id: '2', name: 'Jane Smith', age: 25, gender: "Female", prn: 'PRN002', bed: 'B2', ward: 'Ward A', floor: '2', insuranceCompany: "XYZ Insurance", preauthStatus: "Draft", admissionDate: "2023-01-02" },
+    { id: '3', name: 'Sam Wilson', age: 40, gender: "Male", prn: 'PRN003', bed: 'B3', ward: 'Ward B', floor: '1', insuranceCompany: "LMN Insurance", preauthStatus: "Draft", admissionDate: "2023-01-03" },
+    { id: '4', name: 'Emily Brown', age: 35, gender: "Female", prn: 'PRN004', bed: 'B4', ward: 'Ward B', floor: '3', insuranceCompany: "OPQ Insurance", preauthStatus: "Draft", admissionDate: "2023-01-04" },
+    { id: '5', name: 'Chris Green', age: 28, gender: "Male", prn: 'PRN005', bed: 'B5', ward: 'Ward A', floor: '2', insuranceCompany: "RST Insurance", preauthStatus: "Draft", admissionDate: "2023-01-05" },
   ]
 };
 

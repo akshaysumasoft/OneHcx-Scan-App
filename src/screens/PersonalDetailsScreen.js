@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, FlatList, Switch, Alert, TouchableOpacity } from 'react-native';
+import  DocumentScanner  from 'react-native-document-scanner-plugin';
 
 const requiredDocuments = [
   'Consent Form',
-  // 'Insurance Card',
-  // 'ID Proof',
-  // 'Admission Letter'
+  'Insurance Card',
+  'ID Proof',
+  'Admission Letter'
 ];
 
 export default function PersonDetails({ route, navigation }) {
@@ -32,6 +33,8 @@ export default function PersonDetails({ route, navigation }) {
 
     // In real use, you'd call navigation.navigate here
     // navigation.navigate('Scanner', { personId: person.id, documentType: docType });
+    // opening scanner screen directly for simplicity
+    scanDocument();
   };
 
   const toggleNotAvailable = (docType) => {
@@ -53,13 +56,32 @@ export default function PersonDetails({ route, navigation }) {
     Alert.alert("Success", "All documents handled. Proceeding...");
   };
 
+  const scanDocument = async () => {
+    try {
+        const { scannedImages } = await DocumentScanner.scanDocument();
+        if (scannedImages && scannedImages.length) {
+        console.log('Flattened scanned image:', scannedImages[0]);
+        // You can display or process the flattened image here
+        } else {
+        console.log('No document scanned.');
+        }
+    } catch (error) {
+        console.error('Document scan error:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{person.name}</Text>
+      <Text style={styles.detail}>Age: {person.age}</Text>
+      <Text style={styles.detail}>Gender: {person.gender}</Text>
       <Text style={styles.detail}>PRN: {person.prn}</Text>
       <Text style={styles.detail}>Bed: {person.bed}</Text>
       <Text style={styles.detail}>Ward: {person.ward}</Text>
       <Text style={styles.detail}>Floor: {person.floor}</Text>
+      <Text style={styles.detail}>Insurance Company: {person.insuranceCompany}</Text>
+      <Text style={styles.detail}>Preauth Status: {person.preauthStatus}</Text>
+      <Text style={styles.detail}>Admission Date: {person.admissionDate}</Text>
 
       <Text style={styles.sectionTitle}>Required Documents</Text>
 
@@ -81,7 +103,7 @@ export default function PersonDetails({ route, navigation }) {
                 </View>
               </View>
               <Button
-                title={status.uploaded ? "Uploaded" : "Upload"}
+                title={status.uploaded ? "Scanned" : "Scan"}
                 onPress={() => handleScan(item)}
                 disabled={status.uploaded || status.notAvailable}
               />
