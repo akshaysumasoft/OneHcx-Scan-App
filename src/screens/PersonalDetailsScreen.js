@@ -103,6 +103,7 @@ export default function PersonDetails({ route, navigation }) {
                 </View>
               </View>
               <Button
+                color={ status.uploaded || status.notAvailable ? "#4CAF50" : "#2196F3"}
                 title={status.uploaded ? "Scanned" : "Scan"}
                 onPress={() => handleScan(item)}
                 disabled={status.uploaded || status.notAvailable}
