@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {ChevronRight, CircleUserRound, Search, SlidersHorizontal, SlidersVertical} from 'lucide-react-native'
 import {
   View,
   Text,
@@ -6,8 +7,7 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  Button,
-  Animated,
+  Image
 } from 'react-native';
 
 const dummyApiResponse = {
@@ -52,75 +52,104 @@ export default function HomeScreen({ navigation }) {
 
   const renderPerson = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate('PersonalDetails', { person: item })}>
-    <View style={styles.card}>
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.details}>PRN: {item.prn}</Text>
-      <Text style={styles.details}>Bed: {item.bed} | Ward: {item.ward} | Floor: {item.floor}</Text>
+    <View style={styles.card}>  
+      <View style={styles.imageContainer}>
+      </View>
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.details}>PRN: {item.prn}</Text>
+        <Text style={styles.details}>Bed: {item.bed} | Ward: {item.ward} | Floor: {item.floor}</Text>
+      </View>
+      <View style={styles.iconContainer}>
+        <ChevronRight style={{color: '#163fa7fb'}}/>
+      </View>
     </View>
   </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Hello, Welcome Back 👋</Text>
+      <View style={styles.headerContainer}>
+        <Image source={require('../assets/logo-home.png')}
+          style={styles.image}
+        />
+        <TouchableOpacity>
+          <CircleUserRound size={32}/>
+          {/* <Image source={require('../assets/profile-circle.svg')}
+          style={styles.image}
+          // resizeMode="contain"
+          /> */}
+        </TouchableOpacity>
+      </View>
 
-      <TextInput
-        style={styles.search}
-        placeholder="Search by name..."
-        value={search}
-        onChangeText={setSearch}
-      />
-
-      <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilter(!showFilter)}>
-        <Text style={styles.filterToggleText}>{showFilter ? 'Hide Filters ▲' : 'Show Filters ▼'}</Text>
-      </TouchableOpacity>
-
-      {showFilter && (
-        <View style={styles.filterContainer}>
-          <Text style={styles.filterTitle}>Filter by Ward</Text>
-          <View style={styles.filterGroup}>
-            {uniqueWards.map(ward => (
-              <TouchableOpacity
-                key={ward}
-                style={[
-                  styles.filterButton,
-                  selectedWard === ward && styles.selectedFilter
-                ]}
-                onPress={() => setSelectedWard(selectedWard === ward ? '' : ward)}
-              >
-                <Text style={styles.filterText}>{ward}</Text>
-              </TouchableOpacity>
-            ))}
+      <View style={styles.contentContainer}>
+        <View style={styles.searchWrapper}>
+          <View style={styles.searchContainer}>
+          <Search color={'grey'}/>
+          <TextInput
+            style={styles.search}
+            placeholder="Search by name..."
+            value={search}
+            onChangeText={setSearch}
+          />
           </View>
-
-          <Text style={styles.filterTitle}>Filter by Floor</Text>
-          <View style={styles.filterGroup}>
-            {uniqueFloors.map(floor => (
-              <TouchableOpacity
-                key={floor}
-                style={[
-                  styles.filterButton,
-                  selectedFloor === floor && styles.selectedFilter
-                ]}
-                onPress={() => setSelectedFloor(selectedFloor === floor ? '' : floor)}
-              >
-                <Text style={styles.filterText}>Floor {floor}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <TouchableOpacity style={styles.filterContainer}  onPress={() => setShowFilter(!showFilter)}>
+            <SlidersVertical color={'grey'}/>
+          </TouchableOpacity>
         </View>
-      )}
 
-     <FlatList
-        data={
-          search || selectedWard || selectedFloor
-            ? filtered
-            : people
-        }
-        keyExtractor={item => item.id}
-        renderItem={renderPerson}
-        contentContainerStyle={{ paddingBottom: 120 }}
-      />
+        {showFilter && (
+          <View style={styles.filterContainer}>
+            <Text style={styles.filterTitle}>Filter by Ward</Text>
+            <View style={styles.filterGroup}>
+              {uniqueWards.map(ward => (
+                <TouchableOpacity
+                  key={ward}
+                  style={[
+                    styles.filterButton,
+                    selectedWard === ward && styles.selectedFilter
+                  ]}
+                  onPress={() => setSelectedWard(selectedWard === ward ? '' : ward)}
+                >
+                  <Text style={styles.filterText}>{ward}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.filterTitle}>Filter by Floor</Text>
+            <View style={styles.filterGroup}>
+              {uniqueFloors.map(floor => (
+                <TouchableOpacity
+                  key={floor}
+                  style={[
+                    styles.filterButton,
+                    selectedFloor === floor && styles.selectedFilter
+                  ]}
+                  onPress={() => setSelectedFloor(selectedFloor === floor ? '' : floor)}
+                >
+                  <Text style={styles.filterText}>Floor {floor}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        <Text style={{fontSize: 16, fontWeight: 500, paddingBottom: 8}}>Recent Patients</Text>
+
+        <FlatList
+            data={
+              search || selectedWard || selectedFloor
+                ? filtered
+                : people
+            }
+            ItemSeparatorComponent={<View style={{height: 8}}></View>}
+            keyExtractor={item => item.id}
+            renderItem={renderPerson}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 120 }}
+        />
+      </View>
+
     </View>
   );
 }
@@ -128,38 +157,55 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // padding: 16,
+    // backgroundColor:'white'
+  },
+  headerContainer:{
+    marginBottom: 8,
     padding: 16,
-    backgroundColor: '#f5f7fa',
+    backgroundColor: 'white',
+    alignItems:'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row'
   },
-  header: {
-    fontSize: 24, 
-    fontWeight: '700',
-    marginBottom: 12,
-    color: '#333',
+  contentContainer:{
+    padding: 16,
+    backgroundColor:'white'
   },
-  search: {
+  searchContainer:{
     backgroundColor: '#fff',
-    padding: 12,
+    flexDirection:'row',
+    alignItems:'center',
+    gap: 4,
     borderRadius: 8,
+    flex: 1,
+    paddingLeft: 16,
     fontSize: 16,
+    height: 48,
+    boxSizing: 'border-box',
     borderWidth: 1,
     borderColor: '#ccc',
-    marginBottom: 12,
   },
-  filterToggle: {
-    alignSelf: 'flex-start',
-    marginBottom: 10,
+  filterContainer:{
+    height: 48,
   },
-  filterToggleText: {
-    color: '#3366ff',
-    fontSize: 14,
-    fontWeight: '500',
+  searchWrapper:{
+    flexDirection:'row',
+    justifyContent:'space-between',
+    gap: 8,
+  },
+  search: {
+    flex: 1
+  },
+  image:{
+    height: 46,
+    width: 144,
   },
   filterContainer: {
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 12,
-    marginBottom: 12,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#ddd',
   },
@@ -188,11 +234,20 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 16, 
+    fontSize: 16,
     borderRadius: 12,
-    marginBottom: 12,
     borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     borderColor: '#ddd',
+  },
+  infoContainer:{
+
+  },
+  iconContainer:{
+    justifyContent:'center',
+    alignItems:'center'
   },
   name: {
     fontWeight: 'bold',
