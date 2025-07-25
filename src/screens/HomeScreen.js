@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {ChevronRight, CircleUserRound, Search, SlidersHorizontal, SlidersVertical} from 'lucide-react-native'
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {ChevronRight, Search, UserRound, SlidersVertical} from 'lucide-react-native'
 import {
   View,
   Text,
@@ -7,8 +7,10 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  Image
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+
 
 const dummyApiResponse = {
   status: 200,
@@ -29,6 +31,12 @@ export default function HomeScreen({ navigation }) {
   const [selectedWard, setSelectedWard] = useState('');
   const [selectedFloor, setSelectedFloor] = useState('');
   const [showFilter, setShowFilter] = useState(false);
+
+  const bottomSheetRef = useRef(null)
+  const handleSheetChanges = useCallback((index) => {
+    console.log('Sheet changed to index:', index);
+    setShowFilter(index >= 0); // true when open
+  }, []);
 
   useEffect(() => {
     if (dummyApiResponse.status === 200) {
@@ -67,98 +75,124 @@ export default function HomeScreen({ navigation }) {
   </TouchableOpacity>
   );
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Image source={require('../assets/logo-home.png')}
-          style={styles.image}
-        />
-        <TouchableOpacity>
-          <CircleUserRound size={32}/>
-          {/* <Image source={require('../assets/profile-circle.svg')}
-          style={styles.image}
-          // resizeMode="contain"
-          /> */}
-        </TouchableOpacity>
-      </View>
+  const toggleBottomSheet = () => {
+      const isOpen = bottomSheetRef.current?.index >= 0;
+      if (isOpen) {
+        bottomSheetRef.current?.close();
+      } else {
+        bottomSheetRef.current?.expand();
+      }
+  };
 
-      <View style={styles.contentContainer}>
-        <View style={styles.searchWrapper}>
-          <View style={styles.searchContainer}>
-          <Search color={'grey'}/>
-          <TextInput
-            style={styles.search}
-            placeholder="Search by name..."
-            value={search}
-            onChangeText={setSearch}
+  return (
+    <GestureHandlerRootView style={{flex: 1}}>
+      <View style={styles.container}>
+        {/* <View style={styles.headerContainer}>
+          <Image source={require('../assets/logo-home.png')}
+            style={styles.image}
           />
-          </View>
-          <TouchableOpacity style={styles.filterContainer}  onPress={() => setShowFilter(!showFilter)}>
-            <SlidersVertical color={'grey'}/>
+          <TouchableOpacity>
+            <CircleUserRound size={32}/>
+            <Image source={require('../assets/profile-circle.svg')}
+            style={styles.image}
+            // resizeMode="contain"
+            />
           </TouchableOpacity>
+        </View> */}
+
+        <View style={styles.contentContainer}>
+          
+          <View style={styles.searchWrapper}>
+            <TouchableOpacity style={styles.filterContainer}  onPress={() => {}}>
+              <UserRound color={'grey'} size={24}/>
+            </TouchableOpacity>
+            <View style={styles.searchContainer}>
+            <Search color={'grey'}/>
+            <TextInput
+              style={styles.search}
+              placeholder="Search by name..."
+              value={search}
+              onChangeText={setSearch}
+            />
+            </View>
+            <TouchableOpacity style={styles.filterContainer}  onPress={toggleBottomSheet}>
+              <SlidersVertical color={'grey'}/>
+            </TouchableOpacity>
+          </View>
+
+          {/* {showFilter && (
+            
+          )} */}
+
+          <Text style={{fontSize: 16, fontWeight: 500, paddingBottom: 8}}>Recent Patients</Text>
+
+          <FlatList
+              data={
+                search || selectedWard || selectedFloor
+                  ? filtered
+                  : people
+              }
+              ItemSeparatorComponent={<View style={{height: 8}}></View>}
+              keyExtractor={item => item.id}
+              renderItem={renderPerson}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 120 }}
+          />
         </View>
 
-        {showFilter && (
-          <View style={styles.filterContainer}>
-            <Text style={styles.filterTitle}>Filter by Ward</Text>
-            <View style={styles.filterGroup}>
-              {uniqueWards.map(ward => (
-                <TouchableOpacity
-                  key={ward}
-                  style={[
-                    styles.filterButton,
-                    selectedWard === ward && styles.selectedFilter
-                  ]}
-                  onPress={() => setSelectedWard(selectedWard === ward ? '' : ward)}
-                >
-                  <Text style={styles.filterText}>{ward}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.filterTitle}>Filter by Floor</Text>
-            <View style={styles.filterGroup}>
-              {uniqueFloors.map(floor => (
-                <TouchableOpacity
-                  key={floor}
-                  style={[
-                    styles.filterButton,
-                    selectedFloor === floor && styles.selectedFilter
-                  ]}
-                  onPress={() => setSelectedFloor(selectedFloor === floor ? '' : floor)}
-                >
-                  <Text style={styles.filterText}>Floor {floor}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
-
-        <Text style={{fontSize: 16, fontWeight: 500, paddingBottom: 8}}>Recent Patients</Text>
-
-        <FlatList
-            data={
-              search || selectedWard || selectedFloor
-                ? filtered
-                : people
-            }
-            ItemSeparatorComponent={<View style={{height: 8}}></View>}
-            keyExtractor={item => item.id}
-            renderItem={renderPerson}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 120 }}
-        />
       </View>
+       <BottomSheet
+        ref={bottomSheetRef}
+          index={-1} // Start closed
+          // snapPoints={['40%']} // or any height you want
+          onChange={handleSheetChanges}
+          enablePanDownToClose={true}
+        >
+        <BottomSheetView style={styles.contentContainer}>
+          <View style={styles.filterContainer}>
+              <Text style={styles.filterTitle}>Filter by Ward</Text>
+              <View style={styles.filterGroup}>
+                {uniqueWards.map(ward => (
+                  <TouchableOpacity
+                    key={ward}
+                    style={[
+                      styles.filterButton,
+                      selectedWard === ward && styles.selectedFilter
+                    ]}
+                    onPress={() => setSelectedWard(selectedWard === ward ? '' : ward)}
+                  >
+                    <Text style={[styles.filterText, {color: selectedWard === ward? '#163FA7' : 'black'}]}>{ward}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
 
-    </View>
+              <Text style={styles.filterTitle}>Filter by Floor</Text>
+              <View style={styles.filterGroup}>
+                {uniqueFloors.map(floor => (
+                  <TouchableOpacity
+                    key={floor}
+                    style={[
+                      styles.filterButton,
+                      selectedFloor === floor && styles.selectedFilter
+                    ]}
+                    onPress={() => setSelectedFloor(selectedFloor === floor ? '' : floor)}
+                  >
+                    <Text style={[styles.filterText, {color: selectedFloor === floor ? '#163FA7' : 'black'}]}>Floor {floor}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+        </BottomSheetView>
+      </BottomSheet>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
-    // backgroundColor:'white'
+    backgroundColor:'white',
+    // fontFamily: 'Roboto'
   },
   headerContainer:{
     marginBottom: 8,
@@ -203,15 +237,14 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 12,
     marginBottom: 8,
-    borderWidth: 1,
     borderColor: '#ddd',
   },
   filterTitle: {
-    fontWeight: '600',
-    marginBottom: 6,
+    fontWeight: '400',
+    fontSize: 16,
+    marginBottom: 16,
   },
   filterGroup: {
     flexDirection: 'row',
@@ -219,18 +252,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   filterButton: {
-    backgroundColor: '#eee',
+    borderWidth: 1,
+    borderColor: '#D4D5D6',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 16,
+    borderRadius: 8,
+    justifyContent:'center',
+    alignItems: 'center',
+    height: 42,
     marginRight: 8,
     marginBottom: 6,
   },
   selectedFilter: {
-    backgroundColor: '#cde1ff',
+    backgroundColor: '#dfebfcff',
+    borderWidth: 0
+
   },
   filterText: {
     fontSize: 14,
+    fontWeight: 500
   },
   card: {
     backgroundColor: '#fff',
